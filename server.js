@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
     let x = Number(params.x);
     let y = Number(params.y);
 
-    if (isNaN(X) || isNaN(y) || x <= 0 || y <= 0) {
+    if (isNaN(x) || isNaN(y) || x <= 0 || y <= 0) {
         res.end("NaN");
     }
     else {
