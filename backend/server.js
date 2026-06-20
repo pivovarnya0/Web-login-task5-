@@ -131,6 +131,7 @@ app.patch("/unblock", async (req,res)=>{
 
 });
 
+
 app.delete("/users", async(req,res)=>{
     const {ids}=req.body;
     
@@ -184,11 +185,6 @@ app.post("/login", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-
-app.listen(PORT,()=>{
-
-console.log(
-`Server started http://localhost:${PORT}`
-);
-
+app.listen(PORT, () => {
+  console.log("Server started on", PORT);
 });
