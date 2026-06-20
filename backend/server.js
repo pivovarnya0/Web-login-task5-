@@ -13,6 +13,17 @@ app.get("/", (req,res)=>{
     res.send("back rabotaet");
 });
 
+app.get("/test-db", async (req, res) => {
+  try {
+    const result = await db.query("SELECT NOW()");
+    res.json(result.rows);
+  } catch (e) {
+    res.json({
+      error: e.message
+    });
+  }
+});
+
 
 app.get("/api/hello",(req,res)=>{
 
@@ -91,6 +102,10 @@ app.get("/users", async (req,res)=>{
 
 });
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 app.patch("/block", async (req,res)=>{
     const {ids}=req.body;
 
@@ -129,66 +144,41 @@ app.delete("/users", async(req,res)=>{
 });
 
 
-app.post("/login",async (req,res)=>{
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
-    const result = await db.query(
+  const result = await db.query(
+    `
+    SELECT *
+    FROM users
+    WHERE email=$1
+    AND password=$2
+    `,
+    [email, password]
+  );
 
-        `
-        SELECT *
-        FROM users
-        WHERE email=$1
-        AND password=$2
-        `,
+  const user = result.rows[0];
 
-        [
-            email,
-            password
-        ]
+  if (!user) {
+    return res.json({ message: "Wrong login" });
+  }
 
-    );
+  await db.query(
+    `
+    UPDATE users
+    SET last_login=NOW()
+    WHERE id=$1
+    `,
+    [user.id]
+  );
 
-    const user=result.rows[0];
+  user.last_login = new Date();
 
-    if(!user){
-        return res.json({
-            message:"Wrong login"
-
-        });
-    }
-
-
-    await db.query(
-        
-        `
-
-        UPDATE users
-        SET last_login=NOW()
-        WHERE id=$1
-        `,
-
-        [user.id]
-
-    );
-
-
-
-    user.last_login = new Date();
-
-
-
-    res.json({
-
-        message:"Login success",
-
-        user:user
-
-    });
-
-
-
+  res.json({
+    message: "Login success",
+    user
+  });
 });
-
-
 
 
 
